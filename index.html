@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechVenture Fund I - GP Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="fund-title">TechVenture Fund I</h1>
+                    <div class="fund-info">
+                        <span class="fund-size">$50M Fund</span>
+                        <span class="fund-vintage">2022 Vintage</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="container">
+                <div class="tab-list">
+                    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                    <button class="tab-btn" data-tab="portfolio">Portfolio</button>
+                    <button class="tab-btn" data-tab="capital-calls">Capital Calls</button>
+                    <button class="tab-btn" data-tab="reports">Reports</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <h3>Total Value to Paid-In (TVPI)</h3>
+                            <div class="metric-value" id="tvpi-value">1.85x</div>
+                            <div class="metric-trend positive">+0.12x vs last quarter</div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Distributions to Paid-In (DPI)</h3>
+                            <div class="metric-value" id="dpi-value">0.40x</div>
+                            <div class="metric-trend positive">+0.40x from recent exit</div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Residual Value to Paid-In (RVPI)</h3>
+                            <div class="metric-value" id="rvpi-value">1.45x</div>
+                            <div class="metric-trend neutral">Portfolio valuation</div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Net IRR</h3>
+                            <div class="metric-value" id="irr-value">22.5%</div>
+                            <div class="metric-trend positive">Strong performance</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-section">
+                            <h3>Portfolio Valuation by Sector</h3>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="sectorChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-section">
+                            <h3>Capital Deployment Timeline</h3>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="deploymentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fund-summary">
+                        <div class="summary-card">
+                            <h3>Fund Summary</h3>
+                            <div class="summary-stats">
+                                <div class="stat">
+                                    <span class="stat-label">Total Committed:</span>
+                                    <span class="stat-value">$50.0M</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Paid-In Capital:</span>
+                                    <span class="stat-value" id="paid-in-capital">$37.5M</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Deployed Capital:</span>
+                                    <span class="stat-value" id="deployed-capital">$19.8M</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Portfolio Companies:</span>
+                                    <span class="stat-value" id="portfolio-count">8</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Tab -->
+                <div id="portfolio" class="tab-content">
+                    <div class="portfolio-header">
+                        <h2>Portfolio Companies</h2>
+                        <button class="btn btn--primary" onclick="openAddCompanyModal()">Add Company</button>
+                    </div>
+
+                    <div class="portfolio-table-container">
+                        <table class="portfolio-table">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Sector</th>
+                                    <th>Investment Date</th>
+                                    <th>Investment Amount</th>
+                                    <th>Current Valuation</th>
+                                    <th>Status</th>
+                                    <th>MOIC</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-table-body">
+                                <!-- Portfolio companies will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Capital Calls Tab -->
+                <div id="capital-calls" class="tab-content">
+                    <div class="capital-calls-header">
+                        <h2>Capital Calls & LP Management</h2>
+                        <button class="btn btn--primary" onclick="openCapitalCallModal()">New Capital Call</button>
+                    </div>
+
+                    <div class="capital-calls-grid">
+                        <div class="capital-call-summary">
+                            <h3>Fund Capital Summary</h3>
+                            <div class="capital-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="capital-progress-fill"></div>
+                                </div>
+                                <div class="progress-labels">
+                                    <span>Called: <span id="called-percentage">75%</span></span>
+                                    <span>Remaining: <span id="remaining-percentage">25%</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lp-commitments">
+                            <h3>LP Commitments</h3>
+                            <div class="lp-table-container">
+                                <table class="lp-table">
+                                    <thead>
+                                        <tr>
+                                            <th>LP Name</th>
+                                            <th>Commitment</th>
+                                            <th>Paid-In</th>
+                                            <th>Outstanding</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lp-table-body">
+                                        <!-- LP data will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="capital-calls-history">
+                        <h3>Capital Call History</h3>
+                        <div class="capital-calls-table-container">
+                            <table class="capital-calls-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Percentage</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="capital-calls-table-body">
+                                    <!-- Capital calls will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reports" class="tab-content">
+                    <div class="reports-header">
+                        <h2>LP Reports</h2>
+                        <button class="btn btn--primary" onclick="generateLPReport()">Generate LP Report</button>
+                    </div>
+
+                    <div class="report-preview" id="report-preview">
+                        <div class="report-header">
+                            <h1>TechVenture Fund I</h1>
+                            <h2>Quarterly Report - Q2 2024</h2>
+                            <div class="report-date">Generated: <span id="report-date"></span></div>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>Executive Summary</h3>
+                            <div class="report-content">
+                                <p>TechVenture Fund I continues to demonstrate strong performance with a current TVPI of <span id="report-tvpi">1.85x</span> and a net IRR of <span id="report-irr">22.5%</span>. The fund has deployed <span id="report-deployment">$19.8M</span> across 8 portfolio companies.</p>
+                            </div>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>Key Performance Metrics</h3>
+                            <div class="report-metrics">
+                                <div class="report-metric">
+                                    <span class="metric-label">TVPI:</span>
+                                    <span class="metric-value" id="report-tvpi-detail">1.85x</span>
+                                </div>
+                                <div class="report-metric">
+                                    <span class="metric-label">DPI:</span>
+                                    <span class="metric-value" id="report-dpi-detail">0.40x</span>
+                                </div>
+                                <div class="report-metric">
+                                    <span class="metric-label">RVPI:</span>
+                                    <span class="metric-value" id="report-rvpi-detail">1.45x</span>
+                                </div>
+                                <div class="report-metric">
+                                    <span class="metric-label">Net IRR:</span>
+                                    <span class="metric-value" id="report-irr-detail">22.5%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>Portfolio Summary</h3>
+                            <div id="report-portfolio-table">
+                                <!-- Portfolio table will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <!-- Add/Edit Company Modal -->
+        <div id="company-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="company-modal-title">Add Portfolio Company</h3>
+                    <button class="close-btn" onclick="closeModal('company-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="company-form">
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="company-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sector</label>
+                            <select class="form-control" id="company-sector" required>
+                                <option value="">Select Sector</option>
+                                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                <option value="Healthcare Technology">Healthcare Technology</option>
+                                <option value="Fintech">Fintech</option>
+                                <option value="Cybersecurity">Cybersecurity</option>
+                                <option value="Clean Technology">Clean Technology</option>
+                                <option value="Education Technology">Education Technology</option>
+                                <option value="Retail Technology">Retail Technology</option>
+                                <option value="Supply Chain">Supply Chain</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Investment Date</label>
+                            <input type="date" class="form-control" id="company-investment-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Investment Amount ($)</label>
+                            <input type="number" class="form-control" id="company-investment-amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Valuation ($)</label>
+                            <input type="number" class="form-control" id="company-current-valuation" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="company-status" required>
+                                <option value="Active">Active</option>
+                                <option value="Exited">Exited</option>
+                                <option value="Written Off">Written Off</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--secondary" onclick="closeModal('company-modal')">Cancel</button>
+                    <button class="btn btn--primary" onclick="saveCompany()">Save Company</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Capital Call Modal -->
+        <div id="capital-call-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>New Capital Call</h3>
+                    <button class="close-btn" onclick="closeModal('capital-call-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="capital-call-form">
+                        <div class="form-group">
+                            <label class="form-label">Call Date</label>
+                            <input type="date" class="form-control" id="call-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount ($)</label>
+                            <input type="number" class="form-control" id="call-amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Percentage of Commitments</label>
+                            <input type="number" class="form-control" id="call-percentage" step="0.1" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Purpose</label>
+                            <input type="text" class="form-control" id="call-purpose" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--secondary" onclick="closeModal('capital-call-modal')">Cancel</button>
+                    <button class="btn btn--primary" onclick="saveCapitalCall()">Create Capital Call</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
